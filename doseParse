@@ -1,0 +1,62 @@
+Function doseParse(doseInput As Range) As String
+'by Robert Brownsmith
+   
+    Dim doseInputStr As String
+    Dim testCheck As Boolean
+    Dim maxSduPerDose As Single
+    Dim maxFreqAdmin As Single
+  
+   'convert string to upper case
+    doseInputStr = UCase(doseInput.Value)
+       
+   'account for stated maximum
+   If doseInputStr Like "*MAXIMUM*" Or doseInputStr Like "*TOTAL*" = True Then
+        doseParse = "Refer to Maximum stated in dose and calculate manually"
+   Else
+  
+   'find number of dose units per administration
+  
+        If doseInputStr Like "*ONE OR TWO*" Or doseInputStr Like "*TWO*" Or doseInputStr Like "*1 OR 2*" Or doseInputStr Like "*1-2*" Or doseInputStr Like "*1 - 2*" Or doseInputStr Like "*1 -2*" Or doseInputStr Like "2 *" Or doseInputStr Like "*APPLY 2*" Or doseInputStr Like "* 2 *" = True Then
+            maxSduPerDose = 2
+        ElseIf doseInputStr Like "* ONE *" Or doseInputStr Like "1 *" Or doseInputStr Like "ONE *" Or doseInputStr Like "TAKE 1 [!to-]*" Or doseInputStr Like "TAKE ONE [!to-]*" = True Then
+            maxSduPerDose = 1
+        ElseIf doseInputStr Like "*5ML*10ML*" Or doseInputStr Like "* 10ML*" Or doseInputStr Like "* 5*10ML*" = True Then
+            maxSduPerDose = 10
+        ElseIf doseInputStr Like "*2.5*5*" Or doseInputStr Like "* 5ML*" = True Then
+            maxSduPerDose = 5
+        ElseIf doseInputStr Like "*1.25*2.5ML*" Or doseInputStr Like "* 2.5ML*" Or doseInputStr Like "2.5ML [!-]*" = True Then
+            maxSduPerDose = 2.5
+        ElseIf doseInputStr Like "* 1.25ML*" = True Then
+            maxSduPerDose = 1.25
+        Else
+            maxSduPerDose = 0
+        End If
+       
+        'find dose frequency
+       
+        If doseInputStr Like "*SIX TIMES*" Or doseInputStr Like "*6 TIMES*" Or doseInputStr Like "*EVERY 4*" Or doseInputStr Like "*EVERY FOUR*" Or doseInputStr Like "*4 HOURLY*" Or doseInputStr Like "*4-6*" = True Then
+            maxFreqAdmin = 6
+        ElseIf doseInputStr Like "*FIVE TIMES*" Or doseInputStr Like "*5 TIMES*" = True Then
+            maxFreqAdmin = 5
+        ElseIf doseInputStr Like "*FOUR TIMES*" Or doseInputStr Like "*4 TIMES*" Or doseInputStr Like "*EVERY 6*" Or doseInputStr Like "*QDS*" = True Then
+            maxFreqAdmin = 4
+        ElseIf doseInputStr Like "*THREE TIMES*" Or doseInputStr Like "*EVERY 8*" Or doseInputStr Like "*TDS*" Or doseInputStr Like "*3 TIMES*" = True Then
+            maxFreqAdmin = 3
+        ElseIf doseInputStr Like "*TWO TIMES*" Or doseInputStr Like "*TWICE A DAY*" Or doseInputStr Like "*TWICE DAILY*" Or doseInputStr Like "*EVERY 12*" Or doseInputStr Like "*EVERY TWELVE*" Or doseInputStr Like "*MORNING AND NIGHT*" Or doseInputStr Like "*MORNIND AND EVENING*" Or doseInputStr Like "*BD*" = True Then
+            maxFreqAdmin = 2
+        ElseIf doseInputStr Like "*ONCE*" Or doseInputStr Like "*EVERY DAY*" Or doseInputStr Like "*EVERY 24*" Or doseInputStr Like "*[!AD] AT NIGHT*" Or doseInputStr Like "*[!C][!NS] A DAY" Or doseInputStr Like "[#]ON" = True Then
+            maxFreqAdmin = 1
+        ElseIf doseInputStr Like "*EVERY 3 DAY*" Or doseInputStr Like "*TWICE A WEEK*" Or doseInputStr Like "*WEEKLY*" Or doseInputStr Like "*EVERY 72*" Or doseInputStr Like "*EVERY 7 DAYS*" = True Then
+            maxFreqAdmin = 24
+        Else
+            maxFreqAdmin = 0
+        End If
+       
+        'account for no match
+        If maxSduPerDose = 0 Or maxFreqAdmin = 0 Then
+            doseParse = "dose not parsed"
+        Else
+            doseParse = maxSduPerDose * maxFreqAdmin
+        End If
+    End If
+End Function
